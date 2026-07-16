@@ -1,0 +1,67 @@
+name: Build ARM (OpenWrt)
+
+on:
+  workflow_dispatch:                          # 手动触发
+  push:
+    tags:
+      - 'v*'                                 # 推送 tag v* 时自动构建
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 QEMU（支持跨架构容器）
+        uses: docker/setup-qemu-action@v3
+
+      - name: 在 ARM (musl) 容器中打包
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/src \
+            -w /src \
+            arm32v7/python:3.13-alpine3.21 \
+            sh -c "
+              echo '--- 安装依赖 ---' &&
+              pip install --no-cache-dir \
+                pyinstaller \
+                flask \
+                flask-login \
+                flask-wtf \
+                wtforms \
+                markupsafe \
+              && echo '--- 开始打包 ---' &&
+              pyinstaller --onefile \
+                --name WokTime \
+                --add-data 'app/templates:app/templates' \
+                --add-data 'app/static:app/static' \
+                --add-data 'app/holiday:app/holiday' \
+                --hidden-import flask \
+                --hidden-import flask_login \
+                --hidden-import flask_wtf \
+                --hidden-import flask_wtf.csrf \
+                --hidden-import wtforms \
+                --hidden-import jinja2 \
+                --hidden-import markupsafe \
+                --hidden-import werkzeug \
+                --hidden-import itsdangerous \
+                --hidden-import click \
+                --hidden-import blinker \
+                run.py \
+              && echo '--- 打包完成 ---' &&
+              ls -lh dist/WokTime
+            "
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: WokTime-linux-armv7
+          path: dist/WokTime
+
+      - name: 发布到 Releases（仅 tag 推送时）
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/WokTime
+          generate_release_notes: true

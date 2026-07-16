@@ -157,6 +157,34 @@ pyinstaller --onefile --name WokTime ^
 
 ---
 
+## 交叉编译 ARM（OpenWrt 路由器）
+
+项目内置了 GitHub Actions 工作流（`.github/workflows/build-arm.yml`），可在 ARM Linux（musl libc）上运行：
+
+### 手动触发
+
+1. 在 GitHub 仓库页面点击 **Actions** → **Build ARM (OpenWrt)** → **Run workflow**
+2. 等待几分钟，下载 `WokTime-linux-armv7` 产物
+3. 上传到路由器：
+
+```bash
+# 路由器上执行
+scp user@host:/path/to/WokTime /root/
+chmod +x /root/WokTime
+/root/WokTime --host 0.0.0.0 --port 5000
+```
+
+### 自动触发
+
+推送 git tag（如 `v1.0`）时自动构建并发布到 Releases：
+
+```bash
+git tag v1.0
+git push origin v1.0
+```
+
+---
+
 ## 节假日配置
 
 月视图支持显示法定节假日。数据按年份存放在 `app/holiday/` 目录下，遵循 [holiday-cn](https://github.com/NateScarlet/holiday-cn) 格式：
