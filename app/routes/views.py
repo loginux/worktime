@@ -169,16 +169,16 @@ def month_view():
 
     entries = get_time_entries_by_date_range(current_user.id, first_day.isoformat(), last_day.isoformat())
 
-    # 按日汇总：记录总分钟数和涉及的项目名称
+    # 按日汇总：记录总分钟数和涉及的项目-任务
     daily_map = {}
     for e in entries:
         day_key = str(e["entry_date"])
         if day_key not in daily_map:
             daily_map[day_key] = {"minutes": 0, "projects": []}
         daily_map[day_key]["minutes"] += e["minutes"]
-        pname = e["project_name"]
-        if pname not in daily_map[day_key]["projects"]:
-            daily_map[day_key]["projects"].append(pname)
+        pt = f"{e['project_name']}-{e['task_name']}"
+        if pt not in daily_map[day_key]["projects"]:
+            daily_map[day_key]["projects"].append(pt)
 
     # 构建网格（按周排列，从 first_day 的星期几开始）
     start_weekday = first_day.weekday()
