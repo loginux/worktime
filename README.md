@@ -135,7 +135,22 @@ python run.py --host 0.0.0.0 --port 8080
 pip install pyinstaller
 # 清理旧缓存后打包
 rm -rf dist build *.spec
-pyinstaller --onefile --name WokTime --add-data "app/templates;app/templates" --add-data "app/static;app/static" --add-data "app/holiday;app/holiday" run.py
+pyinstaller --onefile --name WokTime ^
+  --add-data "app/templates;app/templates" ^
+  --add-data "app/static;app/static" ^
+  --add-data "app/holiday;app/holiday" ^
+  --hidden-import flask ^
+  --hidden-import flask_login ^
+  --hidden-import flask_wtf ^
+  --hidden-import flask_wtf.csrf ^
+  --hidden-import wtforms ^
+  --hidden-import jinja2 ^
+  --hidden-import markupsafe ^
+  --hidden-import werkzeug ^
+  --hidden-import itsdangerous ^
+  --hidden-import click ^
+  --hidden-import blinker ^
+  run.py
 ```
 
 打包后在 `dist/WokTime.exe`，双击即可启动。
