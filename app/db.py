@@ -31,6 +31,11 @@ def init_db(app):
     conn = sqlite3.connect(db_path)
     conn.execute("PRAGMA foreign_keys = ON")
     conn.executescript(SCHEMA_SQL)
+    # 兼容旧数据库：新增字段
+    try:
+        conn.execute("ALTER TABLE time_entries ADD COLUMN content TEXT DEFAULT ''")
+    except sqlite3.OperationalError:
+        pass  # 字段已存在
     conn.commit()
     conn.close()
 
@@ -98,6 +103,7 @@ CREATE TABLE IF NOT EXISTS time_entries (
     entry_date DATE NOT NULL,
     minutes INTEGER NOT NULL CHECK(minutes > 0),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    content TEXT DEFAULT '',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (project_id) REFERENCES projects(id),

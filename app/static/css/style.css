@@ -141,6 +141,7 @@ body {
 }
 .table-compact th, .table-compact td { padding: 8px 12px; }
 .actions { display: flex; gap: 6px; }
+.back-link { margin-top: 16px; }
 
 /* ─── Forms ───────────────────────────────────────────────── */
 .form { max-width: 480px; }
@@ -170,6 +171,7 @@ body {
 .minutes-with-calc { display: flex; align-items: center; gap: 8px; }
 .minutes-with-calc .input { flex: 1; }
 .calc-hint { font-size: 12px; color: #059669; white-space: nowrap; }
+.cell-content { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #666; font-size: 13px; }
 
 /* ─── User Select Page ────────────────────────────────────── */
 .user-select-page {

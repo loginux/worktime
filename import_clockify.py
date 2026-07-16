@@ -45,7 +45,14 @@ def parse_pdf(filepath):
         i = 0
         while i < len(lines):
             # 跳过页眉/页脚
-            if lines[i] in ("Detailed report", "Total:", "Date", "Description", "Duration", "User"):
+            if lines[i] in (
+                "Detailed report",
+                "Total:",
+                "Date",
+                "Description",
+                "Duration",
+                "User",
+            ):
                 i += 1
                 continue
             if "Created with Clockify" in lines[i]:
@@ -73,7 +80,7 @@ def parse_pdf(filepath):
                 username = lines[i + 5]
 
                 # 跳过异常用户名（页码、页脚等误解析）
-                if not re.match(r'^[a-zA-Z0-9_\u4e00-\u9fff]+$', username):
+                if not re.match(r"^[a-zA-Z0-9_\u4e00-\u9fff]+$", username):
                     i += 1
                     continue
 
@@ -92,16 +99,18 @@ def parse_pdf(filepath):
                     start_time = parts[0].strip()
                     end_time = parts[1].strip()
 
-                records.append({
-                    "date": date_str.replace("/", "-"),
-                    "description": desc,
-                    "project": project,
-                    "task": task,
-                    "minutes": minutes,
-                    "start_time": start_time,
-                    "end_time": end_time,
-                    "username": username,
-                })
+                records.append(
+                    {
+                        "date": date_str.replace("/", "-"),
+                        "description": desc,
+                        "project": project,
+                        "task": task,
+                        "minutes": minutes,
+                        "start_time": start_time,
+                        "end_time": end_time,
+                        "username": username,
+                    }
+                )
 
                 i += 6
             else:
@@ -136,7 +145,9 @@ def import_records(records):
 
         # --- 用户 ---
         if username not in user_cache:
-            user = query("SELECT * FROM users WHERE username = ?", (username,), one=True)
+            user = query(
+                "SELECT * FROM users WHERE username = ?", (username,), one=True
+            )
             if not user:
                 uid = execute("INSERT INTO users (username) VALUES (?)", (username,))
                 # 创建默认项目+默认任务
@@ -201,9 +212,13 @@ def import_records(records):
                 (pid,),
                 one=True,
             )
-            tid = t["id"] if t else execute(
-                "INSERT INTO tasks (project_id, name, description, is_default) VALUES (?, '默认任务', '', 1)",
-                (pid,),
+            tid = (
+                t["id"]
+                if t
+                else execute(
+                    "INSERT INTO tasks (project_id, name, description, is_default) VALUES (?, '默认任务', '', 1)",
+                    (pid,),
+                )
             )
         else:
             task_key = (pid, task_name)
@@ -215,13 +230,11 @@ def import_records(records):
                 )
                 if not t:
                     tid = execute(
-                        "INSERT INTO tasks (project_id, name, description) VALUES (?, ?, ?)",
-                        (pid, task_name, desc),
+                        "INSERT INTO tasks (project_id, name, description) VALUES (?, ?, '')",
+                        (pid, task_name),
                     )
                 else:
                     tid = t["id"]
-                    if desc and desc != "(Without Description)" and not t["description"]:
-                        execute("UPDATE tasks SET description = ? WHERE id = ?", (desc, tid))
                 task_cache[task_key] = tid
             tid = task_cache[task_key]
 
@@ -236,9 +249,9 @@ def import_records(records):
         )
         if not existing:
             execute(
-                """INSERT INTO time_entries (user_id, project_id, task_id, entry_date, minutes)
-                   VALUES (?, ?, ?, ?, ?)""",
-                (uid, pid, tid, rec["date"], rec["minutes"]),
+                """INSERT INTO time_entries (user_id, project_id, task_id, entry_date, minutes, content)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (uid, pid, tid, rec["date"], rec["minutes"], rec["description"]),
             )
             imported += 1
 

@@ -198,20 +198,20 @@ def get_time_entry_by_id(entry_id):
     )
 
 
-def create_time_entry(user_id, project_id, task_id, entry_date, minutes):
+def create_time_entry(user_id, project_id, task_id, entry_date, minutes, content=""):
     return execute(
-        """INSERT INTO time_entries (user_id, project_id, task_id, entry_date, minutes)
-           VALUES (?, ?, ?, ?, ?)""",
-        (user_id, project_id, task_id, entry_date, minutes),
+        """INSERT INTO time_entries (user_id, project_id, task_id, entry_date, minutes, content)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (user_id, project_id, task_id, entry_date, minutes, content),
     )
 
 
-def update_time_entry(entry_id, project_id, task_id, entry_date, minutes):
+def update_time_entry(entry_id, project_id, task_id, entry_date, minutes, content=""):
     execute(
         """UPDATE time_entries
-           SET project_id = ?, task_id = ?, entry_date = ?, minutes = ?, updated_at = CURRENT_TIMESTAMP
+           SET project_id = ?, task_id = ?, entry_date = ?, minutes = ?, content = ?, updated_at = CURRENT_TIMESTAMP
            WHERE id = ?""",
-        (project_id, task_id, entry_date, minutes, entry_id),
+        (project_id, task_id, entry_date, minutes, content, entry_id),
     )
 
 

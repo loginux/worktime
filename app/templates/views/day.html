@@ -47,8 +47,8 @@
         <tr>
             <th>项目</th>
             <th>任务</th>
+            <th>工作内容</th>
             <th>工时</th>
-            <th>记录时间</th>
             <th>操作</th>
         </tr>
     </thead>
@@ -57,8 +57,8 @@
         <tr>
             <td>{{ e['project_name'] }}</td>
             <td>{{ e['task_name'] }}</td>
+            <td class="cell-content">{{ e['content'] or '--' }}</td>
             <td>{{ format_minutes(e['minutes']) }}（{{ e['minutes'] }}分钟）</td>
-            <td>{{ e['created_at'] }}</td>
             <td class="actions">
                 <a href="{{ url_for('time_entries.edit', entry_id=e['id']) }}" class="btn-sm">编辑</a>
                 <button class="btn-sm btn-danger" onclick="deleteEntry({{ e['id'] }})">删除</button>

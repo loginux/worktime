@@ -23,6 +23,7 @@ class TimeEntryForm(FlaskForm):
     task_id = SelectField("任务", coerce=int, validators=[DataRequired("请选择任务")])
     start_time = StringField("开始时间", default="09:00", validators=[DataRequired("请选择开始时间")])
     end_time = StringField("结束时间", default="18:00", validators=[DataRequired("请选择结束时间")])
+    content = TextAreaField("工作内容", validators=[Optional()])
     minutes = IntegerField(
         "工时（分钟）",
         validators=[Optional(), NumberRange(min=1, message="工时必须大于0")],

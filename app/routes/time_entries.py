@@ -95,6 +95,7 @@ def create():
             form.task_id.data,
             entry_date,
             minutes,
+            form.content.data or "",
         )
         flash("工时记录成功", "success")
         return redirect(url_for("views.day_view", date=entry_date.isoformat()))
@@ -139,6 +140,7 @@ def edit(entry_id):
             form.task_id.data,
             entry_date,
             minutes,
+            form.content.data or "",
         )
         flash("工时记录已更新", "success")
         return redirect(url_for("views.day_view", date=entry_date.isoformat()))
@@ -149,6 +151,7 @@ def edit(entry_id):
     form.task_id.choices = _get_task_choices(entry["project_id"])
     form.task_id.data = entry["task_id"]
     form.minutes.data = entry["minutes"]
+    form.content.data = entry["content"]
     return render_template("time_entries/form.html", form=form, title="编辑工时", entry=entry)
 
 
