@@ -10,7 +10,7 @@ from app.models import (
     get_daily_summary,
     get_projects_by_user,
 )
-from app.holiday import get_holiday_for
+from app.holiday import get_holiday_for, get_holiday_info
 
 views_bp = Blueprint("views", __name__, url_prefix="/views")
 
@@ -193,7 +193,15 @@ def month_view():
                 week.append(None)
             else:
                 info = daily_map.get(current_day.isoformat(), {"minutes": 0, "projects": []})
-                holiday_name = get_holiday_for(current_day)
+                h_info = get_holiday_info(current_day)
+                holiday_name = h_info["name"] if h_info else None
+                is_off_day = h_info["is_off_day"] if h_info is not None else None
+                is_weekend = current_day.weekday() >= 5
+                # 周末默认休息，除非是调休上班(is_off_day=False)
+                if is_off_day is None and is_weekend:
+                    is_off_day = True
+                    if not holiday_name:
+                        holiday_name = "休息日"
                 week.append({
                     "day": current_day.day,
                     "date": current_day,
@@ -201,6 +209,7 @@ def month_view():
                     "projects": info["projects"],
                     "is_today": current_day == today,
                     "holiday": holiday_name,
+                    "is_off_day": is_off_day,
                 })
                 current_day += timedelta(days=1)
         if week and any(d is not None for d in week):

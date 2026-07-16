@@ -13,8 +13,10 @@ _cache = None
 
 
 def _load_all():
-    """扫描 holiday 目录，加载所有年份的节假日"""
-    result = {}  # { "2026-01-01": "元旦" }
+    """扫描 holiday 目录，加载所有年份的节假日
+    返回: { "2026-01-01": {"name": "元旦", "is_off_day": True} }
+    """
+    result = {}
 
     if not os.path.isdir(_HOLIDAY_DIR):
         return result
@@ -35,12 +37,8 @@ def _load_all():
                 name = entry.get("name", "")
                 day_str = entry.get("date", "")
                 is_off = entry.get("isOffDay", True)
-                # isOffDay=true 才是法定假日，false 是调休上班
-                if day_str and name and is_off:
-                    result[day_str] = name
-            elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
-                # 兼容 [date, name] 格式
-                result[entry[0]] = entry[1]
+                if day_str and name:
+                    result[day_str] = {"name": name, "is_off_day": is_off}
     return result
 
 
@@ -53,6 +51,14 @@ def _get_cache():
 
 def get_holiday_for(date_obj):
     """获取某天的节日名称，非节日返回 None"""
+    info = _get_cache().get(date_obj.isoformat())
+    return info["name"] if info else None
+
+
+def get_holiday_info(date_obj):
+    """获取某天的完整节日信息
+    返回: {"name": str, "is_off_day": bool} 或 None
+    """
     return _get_cache().get(date_obj.isoformat())
 
 

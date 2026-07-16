@@ -41,19 +41,6 @@
 </div>
 {% endif %}
 
-{% if summary %}
-<div class="charts-row">
-    <div class="chart-container chart-half">
-        <h4 class="chart-title">按项目</h4>
-        <canvas id="pieProject"></canvas>
-    </div>
-    <div class="chart-container chart-half">
-        <h4 class="chart-title">按项目-任务</h4>
-        <canvas id="pieTask"></canvas>
-    </div>
-</div>
-{% endif %}
-
 {% if entries %}
 <table class="table">
     <thead>
@@ -82,6 +69,18 @@
 </table>
 {% else %}
 <p class="empty-msg">该日暂无工时记录</p>
+{% endif %}
+{% if summary %}
+<div class="charts-row">
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目</h4>
+        <canvas id="pieProject"></canvas>
+    </div>
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目-任务</h4>
+        <canvas id="pieTask"></canvas>
+    </div>
+</div>
 {% endif %}
 {% endblock %}
 

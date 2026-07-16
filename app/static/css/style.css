@@ -268,7 +268,7 @@ body {
     margin-bottom: 20px;
     box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
-.charts-row { display: flex; gap: 16px; margin-bottom: 20px; }
+.charts-row { display: flex; gap: 16px; margin: 20px 0; }
 .chart-half { flex: 1; min-width: 0; }
 .chart-half canvas { max-height: 240px; }
 .chart-title {
@@ -373,7 +373,8 @@ body {
     border-radius: 3px;
     white-space: nowrap;
 }
-.calendar-cell.level-high .cell-holiday {
+.calendar-cell.level-high .cell-holiday,
+.calendar-cell.level-extreme .cell-holiday {
     color: #fff;
     background: rgba(255,255,255,.3);
 }
@@ -390,21 +391,34 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.calendar-cell.level-high .cell-project-tag {
+.calendar-cell.level-high .cell-project-tag,
+.calendar-cell.level-extreme .cell-project-tag {
     background: rgba(255,255,255,.25);
     color: #fff;
 }
+/* ─── 休息日 / 调休日 ────────────────────────────────────── */
+.calendar-cell.off-day.level-none { background: #f3f4f6; }
+.calendar-cell.off-day.level-none:hover { background: #e5e7eb; }
+.calendar-cell.off-day .cell-day { color: #9ca3af; }
+.calendar-cell.off-day .cell-minutes { color: #9ca3af; }
+.calendar-cell.work-day { background: #fff; }
+.off-day .cell-holiday,
+.work-day .cell-holiday { display: inline; }
+
 /* ─── 月视图色阶（用 .calendar-cell. 前缀提高优先级） ────── */
 .calendar-cell.level-none { background: #fff; }
 .calendar-cell.level-low  { background: #fef3c7; }
 .calendar-cell.level-low:hover { background: #fde68a; }
 .calendar-cell.level-mid  { background: #fcd34d; }
 .calendar-cell.level-mid:hover { background: #fbbf24; }
-.calendar-cell.level-high { background: #f87171; }
-.calendar-cell.level-high:hover { background: #ef4444; }
-.calendar-cell.level-high .cell-minutes { color: #fff; }
-.calendar-cell.level-high .cell-day { color: #fff; }
-
+.calendar-cell.level-high { background: #fb923c; }
+.calendar-cell.level-high:hover { background: #f97316; }
+.calendar-cell.level-extreme { background: #f87171; }
+.calendar-cell.level-extreme:hover { background: #ef4444; }
+.calendar-cell.level-high .cell-minutes,
+.calendar-cell.level-extreme .cell-minutes { color: #fff; }
+.calendar-cell.level-high .cell-day,
+.calendar-cell.level-extreme .cell-day { color: #fff; }
 /* ─── Footer ──────────────────────────────────────────────── */
 .footer {
     text-align: center;
@@ -442,3 +456,8 @@ body {
     border-radius: 4px;
     border: 1px solid #e5e7eb;
 }
+.legend-swatch.level-none    { background: #fff; }
+.legend-swatch.level-low     { background: #fef3c7; }
+.legend-swatch.level-mid     { background: #fcd34d; }
+.legend-swatch.level-high    { background: #fb923c; }
+.legend-swatch.level-extreme { background: #f87171; }

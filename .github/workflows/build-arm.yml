@@ -6,6 +6,9 @@ on:
     tags:
       - 'v*'                                 # 推送 tag v* 时自动构建
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest

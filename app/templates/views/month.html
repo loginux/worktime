@@ -23,19 +23,6 @@
     <h3>📊 {{ first_day.isoformat() }} ~ {{ last_day.isoformat() }} 总计：{{ format_minutes(month_total) }}</h3>
 </div>
 
-{% if chart_proj_data != '[]' %}
-<div class="charts-row">
-    <div class="chart-container chart-half">
-        <h4 class="chart-title">按项目</h4>
-        <canvas id="monthPieProject"></canvas>
-    </div>
-    <div class="chart-container chart-half">
-        <h4 class="chart-title">按项目-任务</h4>
-        <canvas id="monthPieTask"></canvas>
-    </div>
-</div>
-{% endif %}
-
 <div class="month-calendar">
     <div class="calendar-header">
         <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
@@ -46,7 +33,9 @@
         {% if day %}
         {% set mins = day['total_minutes'] %}
         {% set level = 'level-none' %}
-        {% if mins >= 630 %}
+        {% if mins >= 690 %}
+        {% set level = 'level-extreme' %}
+        {% elif mins >= 630 %}
         {% set level = 'level-high' %}
         {% elif mins >= 570 %}
         {% set level = 'level-mid' %}
@@ -54,12 +43,16 @@
         {% set level = 'level-low' %}
         {% endif %}
         <a href="{{ url_for('views.day_view', date=day['date'].isoformat()) }}"
-           class="calendar-cell {% if day['is_today'] %}today{% endif %} {{ level }}"
+           class="calendar-cell
+             {% if day['is_today'] %}today{% endif %}
+             {% if day['is_off_day'] == True %}off-day{% endif %}
+             {% if day['is_off_day'] == False %}work-day{% endif %}
+             {{ level }}"
            data-minutes="{{ mins }}">
             <div class="cell-day">
                 {{ day['day'] }}
                 {% if day['holiday'] %}
-                <span class="cell-holiday">{{ day['holiday'] }}</span>
+                <span class="cell-holiday">{{ day['holiday'] }}{% if day['is_off_day'] == False %}-调休{% endif %}</span>
                 {% endif %}
             </div>
             {% if mins > 0 %}
@@ -82,8 +75,21 @@
     <span class="legend-item"><span class="legend-swatch level-none"></span> &lt; 9h</span>
     <span class="legend-item"><span class="legend-swatch level-low"></span> 9h ~ 9.5h</span>
     <span class="legend-item"><span class="legend-swatch level-mid"></span> 9.5h ~ 10.5h</span>
-    <span class="legend-item"><span class="legend-swatch level-high"></span> &gt; 10.5h</span>
+    <span class="legend-item"><span class="legend-swatch level-high"></span> 10.5h ~ 11.5h</span>
+    <span class="legend-item"><span class="legend-swatch level-extreme"></span> &gt; 11.5h</span>
 </div>
+{% if chart_proj_data != '[]' %}
+<div class="charts-row">
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目</h4>
+        <canvas id="monthPieProject"></canvas>
+    </div>
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目-任务</h4>
+        <canvas id="monthPieTask"></canvas>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_scripts %}
