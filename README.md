@@ -133,7 +133,9 @@ python run.py --host 0.0.0.0 --port 8080
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --name WokTime --add-data "app/templates;app/templates" --add-data "app/static;app/static" --add-data "app/holiday;app/holiday" --add-data "app/__init__.py;app" run.py
+# 清理旧缓存后打包
+rm -rf dist build *.spec
+pyinstaller --onefile --name WokTime --add-data "app/templates;app/templates" --add-data "app/static;app/static" --add-data "app/holiday;app/holiday" run.py
 ```
 
 打包后在 `dist/WokTime.exe`，双击即可启动。
