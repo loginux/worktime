@@ -6,9 +6,22 @@
 
 import json
 import os
+import sys
 from datetime import date, timedelta
 
-_HOLIDAY_DIR = os.path.join(os.path.dirname(__file__), "holiday")
+def _get_holiday_dirs():
+    """获取节假日目录列表（优先找 exe 同级的 holiday/，再找打包内的）"""
+    dirs = []
+    # exe 模式：优先读 exe 同级的 holiday/
+    if getattr(sys, "frozen", False):
+        external = os.path.join(os.path.dirname(sys.executable), "holiday")
+        if os.path.isdir(external):
+            dirs.append(external)
+    # 源码模式 / 打包内 fallback
+    bundled = os.path.join(os.path.dirname(__file__), "holiday")
+    if os.path.isdir(bundled):
+        dirs.append(bundled)
+    return dirs
 _cache = None
 
 
@@ -17,14 +30,13 @@ def _load_all():
     返回: { "2026-01-01": {"name": "元旦", "is_off_day": True} }
     """
     result = {}
+    holiday_dirs = _get_holiday_dirs()
 
-    if not os.path.isdir(_HOLIDAY_DIR):
-        return result
-
-    for fname in os.listdir(_HOLIDAY_DIR):
+    for holiday_dir in holiday_dirs:
+        for fname in os.listdir(holiday_dir):
         if not fname.endswith(".json"):
             continue
-        fpath = os.path.join(_HOLIDAY_DIR, fname)
+        fpath = os.path.join(holiday_dir, fname)
         try:
             with open(fpath, encoding="utf-8") as f:
                 data = json.load(f)
