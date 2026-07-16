@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}周视图{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{% endblock %}
+
+{% block content %}
+<div class="view-header">
+    <div class="view-nav">
+        <a href="{{ url_for('views.week_view', date=prev_week) }}" class="btn-sm">‹ 上一周</a>
+        <h2>{{ monday.isoformat() }} ~ {{ sunday.isoformat() }}</h2>
+        <a href="{{ url_for('views.week_view', date=next_week) }}" class="btn-sm">下一周 ›</a>
+    </div>
+    <div class="view-actions">
+        <a href="{{ url_for('time_entries.create') }}" class="btn btn-primary">+ 录入工时</a>
+    </div>
+</div>
+
+<div class="summary-card">
+    <h3>📊 本周总计：{{ format_minutes(week_total) }}</h3>
+</div>
+
+<div class="chart-container">
+    <canvas id="weekChart"></canvas>
+</div>
+
+<div class="week-grid">
+    {% for day in week_days %}
+    <a href="{{ url_for('views.day_view', date=day['date'].isoformat()) }}" class="week-day-card">
+        <div class="week-day-label">{{ day['date'].month }}/{{ day['date'].day }} {{ day['label'] }}</div>
+        <div class="week-day-minutes">{{ format_minutes(day['total_minutes']) }}</div>
+        {% if day['date'] == today %}<div class="today-badge">今天</div>{% endif %}
+    </a>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const ctx = document.getElementById('weekChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [{% for d in week_days %}'{{ d["date"].month }}/{{ d["date"].day }} ({{ d["label"] }})',{% endfor %}],
+        datasets: [{
+            label: '工时（小时）',
+            data: [{% for d in week_days %}{{ d["total_minutes"] }},{% endfor %}],
+            backgroundColor: 'rgba(99, 102, 241, 0.7)',
+            borderColor: 'rgb(99, 102, 241)',
+            borderWidth: 1,
+            borderRadius: 4,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(ctx) {
+                        const m = ctx.parsed.y;
+                        const h = Math.floor(m / 60);
+                        const min = m % 60;
+                        return h > 0 ? h + '小时' + min + '分钟' : min + '分钟';
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: { display: true, text: '小时' },
+                ticks: {
+                    callback: function(value) {
+                        return (value / 60).toFixed(1) + 'h';
+                    }
+                }
+            }
+        },
+        onClick: (e, elements) => {
+            if (elements.length > 0) {
+                const idx = elements[0].index;
+                const dates = [{% for d in week_days %}'{{ d["date"].isoformat() }}',{% endfor %}];
+                window.location.href = '{{ url_for("views.day_view", date="__DATE__") }}'.replace('__DATE__', dates[idx]);
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

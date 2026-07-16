@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}工时记录{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <nav class="navbar">
+        <div class="nav-inner">
+            <div class="nav-left">
+                <a href="{{ url_for('views.day_view') }}" class="nav-brand">⏱ 工时记录</a>
+                <div class="nav-tabs">
+                    <a href="{{ url_for('views.day_view') }}" class="nav-tab {% if request.endpoint == 'views.day_view' %}active{% endif %}">日视图</a>
+                    <a href="{{ url_for('views.week_view') }}" class="nav-tab {% if request.endpoint == 'views.week_view' %}active{% endif %}">周视图</a>
+                    <a href="{{ url_for('views.month_view') }}" class="nav-tab {% if request.endpoint == 'views.month_view' %}active{% endif %}">月视图</a>
+                    <a href="{{ url_for('projects.list_projects') }}" class="nav-tab {% if request.endpoint and request.endpoint.startswith('projects') %}active{% endif %}">项目管理</a>
+                    <a href="{{ url_for('export.export_csv') }}" class="nav-tab {% if request.endpoint == 'export.export_csv' %}active{% endif %}">导出CSV</a>
+                </div>
+            </div>
+            <div class="nav-right">
+                <span class="nav-user">{{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="nav-btn">切换用户</a>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-messages">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

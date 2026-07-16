@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}项目管理{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>项目管理</h2>
+    <a href="{{ url_for('projects.create') }}" class="btn btn-primary">+ 新建项目</a>
+</div>
+
+{% if projects %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>项目名称</th>
+            <th>描述</th>
+            <th>默认</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for proj in projects %}
+        <tr>
+            <td>{{ proj['name'] }}</td>
+            <td>{{ proj['description'] or '--' }}</td>
+            <td>{% if proj['is_default'] %}✅{% endif %}</td>
+            <td class="actions">
+                <a href="{{ url_for('tasks.list_tasks', project_id=proj['id']) }}" class="btn-sm">任务</a>
+                <a href="{{ url_for('projects.edit', project_id=proj['id']) }}" class="btn-sm">编辑</a>
+                {% if not proj['is_default'] %}
+                <button class="btn-sm btn-danger" onclick="deleteProject({{ proj['id'] }}, '{{ proj['name'] }}')">删除</button>
+                {% else %}
+                <button class="btn-sm" disabled title="默认项目不可删除">删除</button>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty-msg">暂无项目</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function deleteProject(id, name) {
+    if (!confirm(`确定删除项目"${name}"？该项目下的所有工时记录将转移至默认项目。`)) return;
+    fetch(`{{ url_for('projects.delete', project_id=0) }}`.replace('/0', '/' + id), {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token() }}'}
+    }).then(r => r.json()).then(data => {
+        if (data.ok) location.reload();
+        else alert(data.error);
+    });
+}
+</script>
+{% endblock %}

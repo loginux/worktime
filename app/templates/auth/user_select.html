@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}选择用户 - 工时记录{% endblock %}
+
+{% block content %}
+<div class="user-select-page">
+    <h1>⏱ 工时记录</h1>
+    <p class="subtitle">选择用户进入系统</p>
+
+    <div class="user-list">
+        {% if users %}
+        <div class="user-grid">
+            {% for user in users %}
+            <a href="{{ url_for('auth.login_as', user_id=user.id) }}" class="user-card">
+                <div class="user-avatar">{{ user.username[0] | upper }}</div>
+                <div class="user-name">{{ user.username }}</div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-msg">暂无用户，请创建一个</p>
+        {% endif %}
+    </div>
+
+    <div class="create-user-section">
+        <h3>创建新用户</h3>
+        <form method="POST" action="{{ url_for('auth.user_select') }}" class="inline-form">
+            {{ form.hidden_tag() }}
+            <div class="form-row">
+                {{ form.username(class="input", placeholder="输入用户名") }}
+                <button type="submit" class="btn btn-primary">创建并进入</button>
+            </div>
+            {% for error in form.username.errors %}
+            <span class="error-msg">{{ error }}</span>
+            {% endfor %}
+        </form>
+    </div>
+</div>
+{% endblock %}

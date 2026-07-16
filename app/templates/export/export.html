@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}导出 CSV{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>导出工时记录 (CSV)</h2>
+</div>
+
+<form method="POST" class="form">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        {{ form.start_date.label }}
+        {{ form.start_date(class="input", type="date") }}
+        {% for error in form.start_date.errors %}
+        <span class="error-msg">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-group">
+        {{ form.end_date.label }}
+        {{ form.end_date(class="input", type="date") }}
+        {% for error in form.end_date.errors %}
+        <span class="error-msg">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">⬇ 导出 CSV</button>
+    </div>
+</form>
+{% endblock %}

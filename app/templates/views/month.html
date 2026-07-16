@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}月视图 - {{ first_day.isoformat() }} ~ {{ last_day.isoformat() }}{% endblock %}
+
+{% block content %}
+<div class="view-header">
+    <div class="view-nav">
+        <a href="{{ url_for('views.month_view', date=prev_month) }}" class="btn-sm">‹ 上月</a>
+        <h2>{{ first_day.isoformat() }} ~ {{ last_day.isoformat() }}</h2>
+        <a href="{{ url_for('views.month_view', date=next_month) }}" class="btn-sm">下月 ›</a>
+    </div>
+    <div class="view-actions" style="display:flex; gap:8px; align-items:center;">
+        <label style="font-size:13px; color:#666;">起始日期</label>
+        <input type="date" id="startDatePicker" value="{{ first_day.isoformat() }}" class="input" style="width:160px;">
+        <a href="{{ url_for('time_entries.create') }}" class="btn btn-primary">+ 录入工时</a>
+    </div>
+</div>
+
+<div class="summary-card">
+    <h3>📊 {{ first_day.isoformat() }} ~ {{ last_day.isoformat() }} 总计：{{ format_minutes(month_total) }}</h3>
+</div>
+
+<div class="month-calendar">
+    <div class="calendar-header">
+        <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+    </div>
+    {% for week in calendar_days %}
+    <div class="calendar-row">
+        {% for day in week %}
+        {% if day %}
+        {% set mins = day['total_minutes'] %}
+        {% set level = 'level-none' %}
+        {% if mins >= 630 %}
+        {% set level = 'level-high' %}
+        {% elif mins >= 570 %}
+        {% set level = 'level-mid' %}
+        {% elif mins >= 540 %}
+        {% set level = 'level-low' %}
+        {% endif %}
+        <a href="{{ url_for('views.day_view', date=day['date'].isoformat()) }}"
+           class="calendar-cell {% if day['is_today'] %}today{% endif %} {{ level }}"
+           data-minutes="{{ mins }}">
+            <div class="cell-day">
+                {{ day['day'] }}
+                {% if day['holiday'] %}
+                <span class="cell-holiday">{{ day['holiday'] }}</span>
+                {% endif %}
+            </div>
+            {% if mins > 0 %}
+            <div class="cell-minutes">{{ format_minutes(mins) }}</div>
+            <div class="cell-projects">
+                {% for pname in day['projects'] %}
+                <span class="cell-project-tag">{{ pname }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </a>
+        {% else %}
+        <div class="calendar-cell empty"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+<div class="color-legend">
+    <span class="legend-item"><span class="legend-swatch level-none"></span> &lt; 9h</span>
+    <span class="legend-item"><span class="legend-swatch level-low"></span> 9h ~ 9.5h</span>
+    <span class="legend-item"><span class="legend-swatch level-mid"></span> 9.5h ~ 10.5h</span>
+    <span class="legend-item"><span class="legend-swatch level-high"></span> &gt; 10.5h</span>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const picker = document.getElementById('startDatePicker');
+    if (picker) {
+        picker.addEventListener('change', function() {
+            if (this.value) {
+                window.location.href = '{{ url_for("views.month_view", date="__DATE__") }}'.replace('__DATE__', this.value);
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

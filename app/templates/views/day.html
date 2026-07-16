@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block title %}日视图 - {{ view_date.isoformat() }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{% endblock %}
+
+{% block content %}
+<div class="view-header">
+    <div class="view-nav">
+        <a href="{{ url_for('views.day_view', date=prev_date) }}" class="btn-sm">‹ 前一天</a>
+        <h2>{{ view_date.isoformat() }}（周{% set weekdays = '一二三四五六日' %}{{ weekdays[view_date.weekday()] }}）</h2>
+        <a href="{{ url_for('views.day_view', date=next_date) }}" class="btn-sm">后一天 ›</a>
+    </div>
+    <div class="view-actions">
+        <a href="{{ url_for('time_entries.create', date=view_date.isoformat()) }}" class="btn btn-primary">+ 录入工时</a>
+    </div>
+</div>
+
+{% if summary %}
+<div class="summary-card">
+    <h3>📊 当日汇总：{{ format_minutes(total_minutes) }}</h3>
+    <table class="table table-compact">
+        <thead>
+            <tr>
+                <th>项目</th>
+                <th>任务</th>
+                <th>工时</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in summary %}
+            <tr>
+                <td>{{ s['project_name'] }}</td>
+                <td>{{ s['task_name'] }}</td>
+                <td>{{ format_minutes(s['total_minutes']) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if summary %}
+<div class="charts-row">
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目</h4>
+        <canvas id="pieProject"></canvas>
+    </div>
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目-任务</h4>
+        <canvas id="pieTask"></canvas>
+    </div>
+</div>
+{% endif %}
+
+{% if entries %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>项目</th>
+            <th>任务</th>
+            <th>工时</th>
+            <th>记录时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for e in entries %}
+        <tr>
+            <td>{{ e['project_name'] }}</td>
+            <td>{{ e['task_name'] }}</td>
+            <td>{{ format_minutes(e['minutes']) }}（{{ e['minutes'] }}分钟）</td>
+            <td>{{ e['created_at'] }}</td>
+            <td class="actions">
+                <a href="{{ url_for('time_entries.edit', entry_id=e['id']) }}" class="btn-sm">编辑</a>
+                <button class="btn-sm btn-danger" onclick="deleteEntry({{ e['id'] }})">删除</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty-msg">该日暂无工时记录</p>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const COLORS = [
+    '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
+    '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1',
+    '#06b6d4', '#84cc16', '#e11d48', '#a855f7', '#22c55e'
+];
+
+// ── 按项目饼图 ──────────────────────────────────────────
+const projLabels = {{ chart_proj_labels | safe }};
+const projData  = {{ chart_proj_data | safe }};
+if (projLabels.length > 0) {
+    new Chart(document.getElementById('pieProject'), {
+        type: 'pie',
+        data: {
+            labels: projLabels,
+            datasets: [{
+                data: projData,
+                backgroundColor: COLORS.slice(0, projLabels.length),
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ── 按项目-任务饼图 ──────────────────────────────────────
+const taskLabels = {{ chart_task_labels | safe }};
+const taskData   = {{ chart_task_data | safe }};
+if (taskLabels.length > 0) {
+    new Chart(document.getElementById('pieTask'), {
+        type: 'pie',
+        data: {
+            labels: taskLabels,
+            datasets: [{
+                data: taskData,
+                backgroundColor: COLORS.slice(0, taskLabels.length),
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 11 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function deleteEntry(id) {
+    if (!confirm('确定删除该条工时记录？')) return;
+    fetch('/time_entries/' + id + '/delete', {
+        method: 'POST',
+        headers: {'X-CSRFToken': '{{ csrf_token() }}'}
+    }).then(r => r.json()).then(data => {
+        if (data.ok) location.reload();
+        else alert(data.error);
+    });
+}
+</script>
+{% endblock %}
