@@ -15,22 +15,25 @@ jobs:
 
       - name: 设置 QEMU（支持跨架构容器）
         uses: docker/setup-qemu-action@v3
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: arm
 
       - name: 在 ARM (musl) 容器中打包
         run: |
           docker run --rm \
+            --platform linux/arm/v7 \
             -v ${{ github.workspace }}:/src \
             -w /src \
-            arm32v7/python:3.13-alpine3.21 \
+            python:3.13-alpine \
             sh -c "
-              echo '--- 安装依赖 ---' &&
-              pip install --no-cache-dir \
+              echo '--- 安装构建工具和依赖 ---' &&
+              apk add --no-cache gcc musl-dev python3-dev &&
+              pip install --no-cache-dir --break-system-packages \
                 pyinstaller \
                 flask \
                 flask-login \
                 flask-wtf \
-                wtforms \
-                markupsafe \
               && echo '--- 开始打包 ---' &&
               pyinstaller --onefile \
                 --name WokTime \
@@ -61,7 +64,8 @@ jobs:
 
       - name: 发布到 Releases（仅 tag 推送时）
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: ncipollo/release-action@v1
         with:
-          files: dist/WokTime
-          generate_release_notes: true
+          artifacts: dist/WokTime
+          generateReleaseNotes: true
+          makeLatest: true
