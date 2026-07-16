@@ -136,7 +136,9 @@ def week_view():
 def month_view():
     """月视图：从起始日期起展示一个月（下个月同日 -1天）"""
     today = date.today()
-    date_str = request.args.get("date", today.isoformat())
+    # 默认从当月1号开始
+    default_start = today.replace(day=1).isoformat()
+    date_str = request.args.get("date", default_start)
 
     try:
         base_date = date.fromisoformat(date_str)

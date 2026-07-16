@@ -124,6 +124,9 @@ python -m venv .venv
 pip install -r requirements.txt
 python run.py
 # 访问 http://127.0.0.1:5000
+
+# 也可指定监听地址和端口：
+python run.py --host 0.0.0.0 --port 8080
 ```
 
 ### 打包为 exe
