@@ -21,6 +21,19 @@
     <h3>📊 本周总计：{{ format_minutes(week_total) }}</h3>
 </div>
 
+{% if chart_proj_data != '[]' %}
+<div class="charts-row">
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目</h4>
+        <canvas id="weekPieProject"></canvas>
+    </div>
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目-任务</h4>
+        <canvas id="weekPieTask"></canvas>
+    </div>
+</div>
+{% endif %}
+
 <div class="chart-container">
     <canvas id="weekChart"></canvas>
 </div>
@@ -38,6 +51,41 @@
 
 {% block extra_scripts %}
 <script>
+const COLORS = [
+    '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
+    '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1',
+    '#06b6d4', '#84cc16', '#e11d48', '#a855f7', '#22c55e'
+];
+
+function renderPie(canvasId, labels, data) {
+    if (labels.length === 0) return;
+    new Chart(document.getElementById(canvasId), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{ data: data, backgroundColor: COLORS.slice(0, labels.length) }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+renderPie('weekPieProject', {{ chart_proj_labels | safe }}, {{ chart_proj_data | safe }});
+renderPie('weekPieTask', {{ chart_task_labels | safe }}, {{ chart_task_data | safe }});
+
 const ctx = document.getElementById('weekChart').getContext('2d');
 new Chart(ctx, {
     type: 'bar',

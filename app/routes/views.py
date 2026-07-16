@@ -118,6 +118,19 @@ def week_view():
     week_days = list(daily_data.values())
     week_total = sum(d["total_minutes"] for d in week_days)
 
+    # ── 饼图数据 ─────────────────────────────────────────────
+    proj_map = {}
+    task_map = {}
+    for e in entries:
+        pname = e["project_name"]
+        proj_map[pname] = proj_map.get(pname, 0) + e["minutes"]
+        label = f"{pname}-{e['task_name']}"
+        task_map[label] = task_map.get(label, 0) + e["minutes"]
+    chart_proj_labels = json.dumps(list(proj_map.keys()), ensure_ascii=False)
+    chart_proj_data = json.dumps(list(proj_map.values()))
+    chart_task_labels = json.dumps(list(task_map.keys()), ensure_ascii=False)
+    chart_task_data = json.dumps(list(task_map.values()))
+
     return render_template(
         "views/week.html",
         monday=monday,
@@ -128,6 +141,10 @@ def week_view():
         today=today,
         prev_week=(monday - timedelta(days=7)).isoformat(),
         next_week=(monday + timedelta(days=7)).isoformat(),
+        chart_proj_labels=chart_proj_labels,
+        chart_proj_data=chart_proj_data,
+        chart_task_labels=chart_task_labels,
+        chart_task_data=chart_task_data,
     )
 
 
@@ -193,6 +210,20 @@ def month_view():
 
     month_total = sum(v["minutes"] for v in daily_map.values())
 
+    # ── 饼图数据 ─────────────────────────────────────────────
+    proj_map = {}
+    task_map = {}
+    for e in entries:
+        pname = e["project_name"]
+        proj_map[pname] = proj_map.get(pname, 0) + e["minutes"]
+        label = f"{pname}-{e['task_name']}"
+        task_map[label] = task_map.get(label, 0) + e["minutes"]
+
+    chart_proj_labels = json.dumps(list(proj_map.keys()), ensure_ascii=False)
+    chart_proj_data = json.dumps(list(proj_map.values()))
+    chart_task_labels = json.dumps(list(task_map.keys()), ensure_ascii=False)
+    chart_task_data = json.dumps(list(task_map.values()))
+
     prev_start = _shift_month(first_day, -1).isoformat()
     next_start = _shift_month(first_day, 1).isoformat()
 
@@ -208,4 +239,8 @@ def month_view():
         today=today,
         prev_month=prev_start,
         next_month=next_start,
+        chart_proj_labels=chart_proj_labels,
+        chart_proj_data=chart_proj_data,
+        chart_task_labels=chart_task_labels,
+        chart_task_data=chart_task_data,
     )

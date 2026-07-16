@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}月视图 - {{ first_day.isoformat() }} ~ {{ last_day.isoformat() }}{% endblock %}
 
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{% endblock %}
+
 {% block content %}
 <div class="view-header">
     <div class="view-nav">
@@ -18,6 +22,19 @@
 <div class="summary-card">
     <h3>📊 {{ first_day.isoformat() }} ~ {{ last_day.isoformat() }} 总计：{{ format_minutes(month_total) }}</h3>
 </div>
+
+{% if chart_proj_data != '[]' %}
+<div class="charts-row">
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目</h4>
+        <canvas id="monthPieProject"></canvas>
+    </div>
+    <div class="chart-container chart-half">
+        <h4 class="chart-title">按项目-任务</h4>
+        <canvas id="monthPieTask"></canvas>
+    </div>
+</div>
+{% endif %}
 
 <div class="month-calendar">
     <div class="calendar-header">
@@ -71,7 +88,42 @@
 
 {% block extra_scripts %}
 <script>
+const COLORS = [
+    '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
+    '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1',
+    '#06b6d4', '#84cc16', '#e11d48', '#a855f7', '#22c55e'
+];
+
+function renderPie(canvasId, labels, data) {
+    if (labels.length === 0) return;
+    new Chart(document.getElementById(canvasId), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{ data: data, backgroundColor: COLORS.slice(0, labels.length) }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 12 } } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    renderPie('monthPieProject', {{ chart_proj_labels | safe }}, {{ chart_proj_data | safe }});
+    renderPie('monthPieTask', {{ chart_task_labels | safe }}, {{ chart_task_data | safe }});
+
     const picker = document.getElementById('startDatePicker');
     if (picker) {
         picker.addEventListener('change', function() {

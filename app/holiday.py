@@ -38,9 +38,6 @@ def _load_all():
                 # isOffDay=true 才是法定假日，false 是调休上班
                 if day_str and name and is_off:
                     result[day_str] = name
-            elif isinstance(entry, str) and "-" in entry:
-                # 兼容简单格式：直接是日期字符串
-                pass
             elif isinstance(entry, (list, tuple)) and len(entry) >= 2:
                 # 兼容 [date, name] 格式
                 result[entry[0]] = entry[1]

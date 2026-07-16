@@ -56,7 +56,6 @@ def export_csv():
             mimetype="text/csv; charset=utf-8",
             headers={
                 "Content-Disposition": f"attachment; filename={filename_encoded}; filename*=UTF-8''{filename_encoded}",
-                "Content-Type": "text/csv; charset=utf-8",
             },
         )
 

@@ -43,7 +43,22 @@
         {% block content %}{% endblock %}
     </main>
 
+    <footer class="footer">
+        <span>WokTime v0.1</span>
+        <span id="renderTime">-- ms</span>
+    </footer>
+
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
     {% block extra_scripts %}{% endblock %}
+    <script>
+        // 页面渲染耗时
+        window.addEventListener('load', function() {
+            var rt = document.getElementById('renderTime');
+            if (rt && performance) {
+                var ms = (performance.now() / 1).toFixed(0);
+                rt.textContent = ms + ' ms';
+            }
+        });
+    </script>
 </body>
 </html>

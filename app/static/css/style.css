@@ -394,8 +394,6 @@ body {
     background: rgba(255,255,255,.25);
     color: #fff;
 }
-.calendar-cell:hover { background: #f5f3ff; }
-
 /* ─── 月视图色阶（用 .calendar-cell. 前缀提高优先级） ────── */
 .calendar-cell.level-none { background: #fff; }
 .calendar-cell.level-low  { background: #fef3c7; }
@@ -406,6 +404,19 @@ body {
 .calendar-cell.level-high:hover { background: #ef4444; }
 .calendar-cell.level-high .cell-minutes { color: #fff; }
 .calendar-cell.level-high .cell-day { color: #fff; }
+
+/* ─── Footer ──────────────────────────────────────────────── */
+.footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 12px;
+    color: #9ca3af;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
 
 .color-legend {
     display: flex;

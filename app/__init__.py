@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
@@ -13,8 +14,6 @@ def create_app():
     app.config.from_object(Config)
 
     # 确保 instance 目录存在
-    import os
-
     os.makedirs(app.instance_path, exist_ok=True)
 
     # 初始化扩展
