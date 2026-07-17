@@ -33,13 +33,14 @@ def export_csv():
         output = io.StringIO()
         output.write("\ufeff")  # BOM
         writer = csv.writer(output)
-        writer.writerow(["日期", "项目名称", "任务名称", "工时(分钟)", "记录ID"])
+        writer.writerow(["日期", "项目名称", "任务名称", "工作内容", "工时(分钟)", "记录ID"])
 
         for e in entries:
             writer.writerow([
                 str(e["entry_date"]),
                 e["project_name"],
                 e["task_name"],
+                e["content"] or "",
                 e["minutes"],
                 e["id"],
             ])
