@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from app.db import query, execute, execute_many
+from app.db import query, execute
 
 
 # ─── User ───────────────────────────────────────────────────────────────────

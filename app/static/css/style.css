@@ -419,8 +419,8 @@ body {
 .calendar-cell.level-mid:hover { background: #fbbf24; }
 .calendar-cell.level-high { background: #fb923c; }
 .calendar-cell.level-high:hover { background: #f97316; }
-.calendar-cell.level-extreme { background: #f87171; }
-.calendar-cell.level-extreme:hover { background: #ef4444; }
+.calendar-cell.level-extreme { background: #dc2626; }
+.calendar-cell.level-extreme:hover { background: #b91c1c; }
 .calendar-cell.level-high .cell-minutes,
 .calendar-cell.level-extreme .cell-minutes { color: #fff; }
 .calendar-cell.level-high .cell-day,
@@ -466,4 +466,4 @@ body {
 .legend-swatch.level-low     { background: #fef3c7; }
 .legend-swatch.level-mid     { background: #fcd34d; }
 .legend-swatch.level-high    { background: #fb923c; }
-.legend-swatch.level-extreme { background: #f87171; }
+.legend-swatch.level-extreme { background: #dc2626; }

@@ -33,22 +33,20 @@
         {% if day %}
         {% set mins = day['total_minutes'] %}
         {% set level = 'level-none' %}
-        {% if mins >= 690 %}
+        {% if mins >= 720 %}
         {% set level = 'level-extreme' %}
-        {% elif mins >= 630 %}
+        {% elif mins >= 660 %}
         {% set level = 'level-high' %}
-        {% elif mins >= 570 %}
+        {% elif mins >= 600 %}
         {% set level = 'level-mid' %}
         {% elif mins >= 540 %}
         {% set level = 'level-low' %}
         {% endif %}
-        <a href="{{ url_for('views.day_view', date=day['date'].isoformat()) }}"
-           class="calendar-cell
+        <a href="{{ url_for('views.day_view', date=day['date'].isoformat()) }}" class="calendar-cell
              {% if day['is_today'] %}today{% endif %}
              {% if day['is_off_day'] == True %}off-day{% endif %}
              {% if day['is_off_day'] == False %}work-day{% endif %}
-             {{ level }}"
-           data-minutes="{{ mins }}">
+             {{ level }}" data-minutes="{{ mins }}">
             <div class="cell-day">
                 {{ day['day'] }}
                 {% if day['holiday'] %}
@@ -73,10 +71,10 @@
 </div>
 <div class="color-legend">
     <span class="legend-item"><span class="legend-swatch level-none"></span> &lt; 9h</span>
-    <span class="legend-item"><span class="legend-swatch level-low"></span> 9h ~ 9.5h</span>
-    <span class="legend-item"><span class="legend-swatch level-mid"></span> 9.5h ~ 10.5h</span>
-    <span class="legend-item"><span class="legend-swatch level-high"></span> 10.5h ~ 11.5h</span>
-    <span class="legend-item"><span class="legend-swatch level-extreme"></span> &gt; 11.5h</span>
+    <span class="legend-item"><span class="legend-swatch level-low"></span> [9h, 10h)</span>
+    <span class="legend-item"><span class="legend-swatch level-mid"></span> [10h, 11h)</span>
+    <span class="legend-item"><span class="legend-swatch level-high"></span> [11h, 12h)</span>
+    <span class="legend-item"><span class="legend-swatch level-extreme"></span> &ge; 12h</span>
 </div>
 {% if chart_proj_data != '[]' %}
 <div class="charts-row">
@@ -94,45 +92,45 @@
 
 {% block extra_scripts %}
 <script>
-const COLORS = [
-    '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
-    '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1',
-    '#06b6d4', '#84cc16', '#e11d48', '#a855f7', '#22c55e'
-];
+    const COLORS = [
+        '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444',
+        '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1',
+        '#06b6d4', '#84cc16', '#e11d48', '#a855f7', '#22c55e'
+    ];
 
-function renderPie(canvasId, labels, data) {
-    if (labels.length === 0) return;
-    new Chart(document.getElementById(canvasId), {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{ data: data, backgroundColor: COLORS.slice(0, labels.length) }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom', labels: { font: { size: 12 } } },
-                tooltip: {
-                    callbacks: {
-                        label: function(ctx) {
-                            const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                            const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+    function renderPie(canvasId, labels, data) {
+        if (labels.length === 0) return;
+        new Chart(document.getElementById(canvasId), {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{ data: data, backgroundColor: COLORS.slice(0, labels.length) }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 12 } } },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                                return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-}
+        });
+    }
 
-document.addEventListener('DOMContentLoaded', function() {
-    renderPie('monthPieProject', {{ chart_proj_labels | safe }}, {{ chart_proj_data | safe }});
+    document.addEventListener('DOMContentLoaded', function () {
+        renderPie('monthPieProject', {{ chart_proj_labels | safe }}, {{ chart_proj_data | safe }});
     renderPie('monthPieTask', {{ chart_task_labels | safe }}, {{ chart_task_data | safe }});
 
     const picker = document.getElementById('startDatePicker');
     if (picker) {
-        picker.addEventListener('change', function() {
+        picker.addEventListener('change', function () {
             if (this.value) {
                 window.location.href = '{{ url_for("views.month_view", date="__DATE__") }}'.replace('__DATE__', this.value);
             }

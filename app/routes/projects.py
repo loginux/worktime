@@ -8,7 +8,6 @@ from app.models import (
     create_project,
     update_project,
     soft_delete_project,
-    get_tasks_by_project_all,
     soft_delete_tasks_by_project,
     transfer_entries_to_default,
     get_default_task,

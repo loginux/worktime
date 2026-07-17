@@ -7,7 +7,6 @@ from app.models import (
     get_time_entries_by_date,
     get_time_entries_by_date_range,
     get_project_task_summary,
-    get_daily_summary,
     get_projects_by_user,
 )
 from app.holiday import get_holiday_for, get_holiday_info

@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import login_required, current_user
 from app.forms import TimeEntryForm

@@ -18,7 +18,7 @@
                     <a href="{{ url_for('views.week_view') }}" class="nav-tab {% if request.endpoint == 'views.week_view' %}active{% endif %}">周视图</a>
                     <a href="{{ url_for('views.month_view') }}" class="nav-tab {% if request.endpoint == 'views.month_view' %}active{% endif %}">月视图</a>
                     <a href="{{ url_for('projects.list_projects') }}" class="nav-tab {% if request.endpoint and request.endpoint.startswith('projects') %}active{% endif %}">项目管理</a>
-                    <a href="{{ url_for('export.export_csv') }}" class="nav-tab {% if request.endpoint == 'export.export_csv' %}active{% endif %}">导出CSV</a>
+                    <a href="{{ url_for('export.export_csv') }}" class="nav-tab {% if request.endpoint == 'export.export_csv' %}active{% endif %}">数据下载</a>
                 </div>
             </div>
             <div class="nav-right">
@@ -44,7 +44,7 @@
     </main>
 
     <footer class="footer">
-        <span>WokTime v0.6</span>
+        <span>WokTime v1.0</span>
         <span id="renderTime">-- ms</span>
     </footer>
 

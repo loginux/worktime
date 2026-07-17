@@ -25,6 +25,12 @@ def create_app():
 
     db.init_db(app)
 
+    # 启动时备份数据库（带去重，防止 debug reloader 双次触发）
+    from app.backup import do_startup_backup, start_weekly_backup
+
+    do_startup_backup(app.config["DATABASE"])
+    start_weekly_backup(app)
+
     # 注册蓝图
     from app.routes.auth import auth_bp
     from app.routes.projects import projects_bp
