@@ -127,8 +127,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (startTime && endTime) {
         startTime.addEventListener('change', calcMinutes);
         endTime.addEventListener('change', calcMinutes);
-        // 初始计算
-        setTimeout(calcMinutes, 100);
+        // 初始计算（仅在编辑模式下分钟数为空时触发）
+        if (!minutesInput || !minutesInput.value) {
+            setTimeout(calcMinutes, 100);
+        }
     }
 
     // 手动修改分钟数时清除提示
