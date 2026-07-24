@@ -114,7 +114,8 @@ if (projLabels.length > 0) {
                         label: function(ctx) {
                             const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                             const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                            const hours = (ctx.parsed / 60).toFixed(1);
+                            return ctx.label + ': ' + hours + '小时 (' + pct + '%)';
                         }
                     }
                 }
@@ -145,7 +146,8 @@ if (taskLabels.length > 0) {
                         label: function(ctx) {
                             const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
                             const pct = ((ctx.parsed / total) * 100).toFixed(1);
-                            return ctx.label + ': ' + ctx.parsed + '分钟 (' + pct + '%)';
+                            const hours = (ctx.parsed / 60).toFixed(1);
+                            return ctx.label + ': ' + hours + '小时 (' + pct + '%)';
                         }
                     }
                 }
