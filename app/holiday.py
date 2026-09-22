@@ -1,7 +1,8 @@
 """法定节假日模块
 
-从 app/holiday/ 目录加载年度节假日配置（格式：holiday-cn 标准）。
+仅从外部目录加载年度节假日配置（格式：holiday-cn 标准）。
 文件命名：{年份}.json，如 2026.json、2027.json
+外部目录：exe 同级的 holiday/ 目录
 """
 
 import json
@@ -12,48 +13,42 @@ from datetime import date
 _cache = None
 
 
-def _get_holiday_dirs():
-    """获取节假日目录列表（优先找 exe 同级的 holiday/，再找打包内的）"""
-    dirs = []
-    # exe 模式：优先读 exe 同级的 holiday/
+def _get_holiday_dir():
+    """获取外部节假日目录（exe 同级的 holiday/）"""
     if getattr(sys, "frozen", False):
-        external = os.path.join(os.path.dirname(sys.executable), "holiday")
-        if os.path.isdir(external):
-            dirs.append(external)
-            return dirs
-    # 源码模式 / 打包内 fallback
-    bundled = os.path.join(os.path.dirname(__file__), "holiday")
-    if os.path.isdir(bundled):
-        dirs.append(bundled)
-    return dirs
+        return os.path.join(os.path.dirname(sys.executable), "holiday")
+    # 源码模式：app/holiday/ 目录
+    return os.path.join(os.path.dirname(__file__), "holiday")
 
 
 def _load_all():
-    """扫描 holiday 目录，加载所有年份的节假日
+    """扫描外部 holiday 目录，加载所有年份的节假日
     返回: { "2026-01-01": {"name": "元旦", "is_off_day": True} }
     """
     result = {}
-    holiday_dirs = _get_holiday_dirs()
+    holiday_dir = _get_holiday_dir()
 
-    for holiday_dir in holiday_dirs:
-        for fname in os.listdir(holiday_dir):
-            if not fname.endswith(".json"):
-                continue
-            fpath = os.path.join(holiday_dir, fname)
-            try:
-                with open(fpath, encoding="utf-8") as f:
-                    data = json.load(f)
-            except (json.JSONDecodeError, OSError):
-                continue
+    if not os.path.isdir(holiday_dir):
+        return result
 
-            days = data.get("days", []) if isinstance(data, dict) else data
-            for entry in days:
-                if isinstance(entry, dict):
-                    name = entry.get("name", "")
-                    day_str = entry.get("date", "")
-                    is_off = entry.get("isOffDay", True)
-                    if day_str and name:
-                        result[day_str] = {"name": name, "is_off_day": is_off}
+    for fname in os.listdir(holiday_dir):
+        if not fname.endswith(".json"):
+            continue
+        fpath = os.path.join(holiday_dir, fname)
+        try:
+            with open(fpath, encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            continue
+
+        days = data.get("days", []) if isinstance(data, dict) else data
+        for entry in days:
+            if isinstance(entry, dict):
+                name = entry.get("name", "")
+                day_str = entry.get("date", "")
+                is_off = entry.get("isOffDay", True)
+                if day_str and name:
+                    result[day_str] = {"name": name, "is_off_day": is_off}
     return result
 
 

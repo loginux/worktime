@@ -168,13 +168,15 @@ def month_view():
 
     entries = get_time_entries_by_date_range(current_user.id, first_day.isoformat(), last_day.isoformat())
 
-    # 按日汇总：记录总分钟数和涉及的项目-任务
+    # 按日汇总：记录总分钟数、涉及的项目-任务、是否含"请假"任务
     daily_map = {}
     for e in entries:
         day_key = str(e["entry_date"])
         if day_key not in daily_map:
-            daily_map[day_key] = {"minutes": 0, "projects": []}
+            daily_map[day_key] = {"minutes": 0, "projects": [], "has_leave": False}
         daily_map[day_key]["minutes"] += e["minutes"]
+        if "请假" in (e["task_name"] or ""):
+            daily_map[day_key]["has_leave"] = True
         pt = f"{e['project_name']}-{e['task_name']}"
         if pt not in daily_map[day_key]["projects"]:
             daily_map[day_key]["projects"].append(pt)
@@ -191,7 +193,7 @@ def month_view():
             elif row == 0 and col < start_weekday:
                 week.append(None)
             else:
-                info = daily_map.get(current_day.isoformat(), {"minutes": 0, "projects": []})
+                info = daily_map.get(current_day.isoformat(), {"minutes": 0, "projects": [], "has_leave": False})
                 h_info = get_holiday_info(current_day)
                 holiday_name = h_info["name"] if h_info else None
                 is_off_day = h_info["is_off_day"] if h_info is not None else None
@@ -206,6 +208,7 @@ def month_view():
                     "date": current_day,
                     "total_minutes": info["minutes"],
                     "projects": info["projects"],
+                    "has_leave": info["has_leave"],
                     "is_today": current_day == today,
                     "holiday": holiday_name,
                     "is_off_day": is_off_day,

@@ -112,11 +112,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const [sh, sm] = start.split(':').map(Number);
         const [eh, em] = end.split(':').map(Number);
-        const diff = (eh * 60 + em) - (sh * 60 + sm);
+        let diff = (eh * 60 + em) - (sh * 60 + sm);
 
         if (diff > 0) {
+            // 扣除午休 12:00-13:00
+            const startMin = sh * 60 + sm, endMin = eh * 60 + em;
+            const lunchStart = 720, lunchEnd = 780;
+            if (startMin < lunchEnd && endMin > lunchStart) {
+                diff -= Math.max(0, Math.min(endMin, lunchEnd) - Math.max(startMin, lunchStart));
+            }
             minutesInput.value = diff;
-            calcHint.textContent = '✓ 已自动计算';
+            calcHint.textContent = '✓ 已自动计算（扣除午休12-13）';
             calcHint.style.color = '#059669';
         } else {
             calcHint.textContent = '⚠ 结束时间需晚于开始时间';

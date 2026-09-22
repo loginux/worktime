@@ -33,14 +33,21 @@
         {% if day %}
         {% set mins = day['total_minutes'] %}
         {% set level = 'level-none' %}
-        {% if mins >= 720 %}
+        {% if day['has_leave'] %}
+        {% set level = 'level-absent' %}
+        {% else %}
+        {% if mins >= 690 %}
         {% set level = 'level-extreme' %}
-        {% elif mins >= 660 %}
+        {% elif mins >= 630 %}
         {% set level = 'level-high' %}
-        {% elif mins >= 600 %}
+        {% elif mins >= 570 %}
         {% set level = 'level-mid' %}
-        {% elif mins >= 540 %}
+        {% elif mins >= 510 %}
         {% set level = 'level-low' %}
+        {% endif %}
+        {% if day['is_off_day'] == True and mins > 0 and level in ['level-none', 'level-low'] %}
+        {% set level = 'level-mid' %}
+        {% endif %}
         {% endif %}
         <a href="{{ url_for('views.day_view', date=day['date'].isoformat()) }}" class="calendar-cell
              {% if day['is_today'] %}today{% endif %}
@@ -70,11 +77,11 @@
     {% endfor %}
 </div>
 <div class="color-legend">
-    <span class="legend-item"><span class="legend-swatch level-none"></span> &lt; 9h</span>
-    <span class="legend-item"><span class="legend-swatch level-low"></span> [9h, 10h)</span>
-    <span class="legend-item"><span class="legend-swatch level-mid"></span> [10h, 11h)</span>
-    <span class="legend-item"><span class="legend-swatch level-high"></span> [11h, 12h)</span>
-    <span class="legend-item"><span class="legend-swatch level-extreme"></span> &ge; 12h</span>
+    <span class="legend-item"><span class="legend-swatch level-none"></span> < 8.5h</span>
+    <span class="legend-item"><span class="legend-swatch level-low"></span> [8.5h, 9.5h)</span>
+    <span class="legend-item"><span class="legend-swatch level-mid"></span> [9.5h, 10.5h)</span>
+    <span class="legend-item"><span class="legend-swatch level-high"></span> [10.5h, 11.5h)</span>
+    <span class="legend-item"><span class="legend-swatch level-extreme"></span> &ge; 11.5h</span>
 </div>
 {% if chart_proj_data != '[]' %}
 <div class="charts-row">

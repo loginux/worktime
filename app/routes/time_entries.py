@@ -24,12 +24,27 @@ def _parse_time(time_str):
 
 
 def _calc_minutes(start_time, end_time):
-    """计算两个时间之间的分钟数"""
+    """计算两个时间之间的分钟数（排除午休 12:00-13:00）"""
     start = _parse_time(start_time)
     end = _parse_time(end_time)
     if start is None or end is None:
         return None
-    return (end[0] * 60 + end[1]) - (start[0] * 60 + start[1])
+
+    start_min = start[0] * 60 + start[1]
+    end_min = end[0] * 60 + end[1]
+    total = end_min - start_min
+
+    # 午休时间：12:00 (720) - 13:00 (780)
+    lunch_start = 12 * 60
+    lunch_end = 13 * 60
+
+    # 如果时间段覆盖了午休时间，减去 60 分钟
+    if start_min < lunch_end and end_min > lunch_start:
+        overlap_start = max(start_min, lunch_start)
+        overlap_end = min(end_min, lunch_end)
+        total -= max(0, overlap_end - overlap_start)
+
+    return max(0, total)
 
 time_entries_bp = Blueprint("time_entries", __name__, url_prefix="/time_entries")
 

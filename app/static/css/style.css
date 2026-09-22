@@ -413,6 +413,8 @@ body {
 
 /* ─── 月视图色阶（用 .calendar-cell. 前缀提高优先级） ────── */
 .calendar-cell.level-none { background: #fff; }
+.calendar-cell.level-absent { background: #cbd5e1; }
+.calendar-cell.level-absent:hover { background: #94a3b8; }
 .calendar-cell.level-low  { background: #fef3c7; }
 .calendar-cell.level-low:hover { background: #fde68a; }
 .calendar-cell.level-mid  { background: #fcd34d; }
@@ -463,6 +465,7 @@ body {
     border: 1px solid #e5e7eb;
 }
 .legend-swatch.level-none    { background: #fff; }
+.legend-swatch.level-absent  { background: #cbd5e1; }
 .legend-swatch.level-low     { background: #fef3c7; }
 .legend-swatch.level-mid     { background: #fcd34d; }
 .legend-swatch.level-high    { background: #fb923c; }

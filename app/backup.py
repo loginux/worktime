@@ -13,7 +13,7 @@ import time
 from datetime import datetime
 
 BACKUP_PREFIX = "woktime.db.backup-"
-MAX_BACKUPS = 6
+MAX_BACKUPS = 9
 
 # 调试模式下 reloader 会加载两次，用此标记避免重复启动备份
 _startup_backup_done = False

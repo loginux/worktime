@@ -31,7 +31,6 @@ echo [2/3] 打包中，请稍候...
 "%PYINSTALLER%" --onefile --name WokTime ^
     --add-data "app\templates;app\templates" ^
     --add-data "app\static;app\static" ^
-    --add-data "app\holiday;app\holiday" ^
     --hidden-import flask ^
     --hidden-import flask_login ^
     --hidden-import flask_wtf ^
